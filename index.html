@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cuentas Claras · Presupuesto mensual</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg fill='%233b6ef5'%3E%3Crect x='4' y='18' width='6' height='10' rx='1.5'/%3E%3Crect x='13' y='11' width='6' height='17' rx='1.5'/%3E%3Crect x='22' y='4' width='6' height='24' rx='1.5'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+<header>
+ <div class="brand"><svg class="logo" viewBox="0 0 32 32" role="img" aria-label="Logotipo de Cuentas Claras"><g style="fill:var(--ac)"><rect x="4" y="18" width="6" height="10" rx="1.5"/><rect x="13" y="11" width="6" height="17" rx="1.5"/><rect x="22" y="4" width="6" height="24" rx="1.5"/></g><path d="M2 30.5 H30" style="fill:none;stroke:var(--mut);stroke-width:1.2;stroke-linecap:round"/></svg><div><h1>Cuentas Claras</h1><p>Ve en qué gastas y planifica lo que ingresas. Tus datos se guardan en este navegador.</p></div></div>
+ <div class="mes"><button id="prev" aria-label="Mes anterior">‹</button><input type="month" id="mes" aria-label="Mes"><button id="next" aria-label="Mes siguiente">›</button></div>
+</header>
+<nav role="tablist" id="tabs">
+ <button role="tab" data-t="res" aria-selected="true">Resumen</button>
+ <button role="tab" data-t="mov" aria-selected="false">Movimientos</button>
+ <button role="tab" data-t="lim" aria-selected="false">Límites</button>
+ <button role="tab" data-t="met" aria-selected="false">Metas de ahorro</button>
+ <button role="tab" data-t="aju" aria-selected="false">Ajustes</button>
+</nav>
+
+<section id="res">
+ <div class="kpis" id="kpis"></div>
+ <div class="card" style="margin-bottom:16px"><h2>Porcentaje del ingreso gastado</h2><div class="bar" style="height:16px"><i id="pbar"></i></div><p id="ptxt" style="margin:8px 0 0;color:var(--mut)"></p></div>
+ <div class="grid2">
+  <div class="card"><h2>Gasto por categoría</h2><div id="donut"></div></div>
+  <div class="card"><h2>Ingresos y gastos, últimos 6 meses</h2><div id="bars"></div></div>
+ </div>
+ <div class="card"><h2>Límites del mes</h2><div id="limprog"></div></div>
+</section>
+
+<section id="mov" hidden>
+ <div class="card">
+  <h2>Nuevo movimiento</h2>
+  <div class="f">
+   <select id="mt" aria-label="Tipo"><option value="g">Gasto</option><option value="i">Ingreso</option></select>
+   <select id="mc" aria-label="Categoría"></select>
+   <input id="mm" type="number" min="0" step="0.01" placeholder="Importe" aria-label="Importe">
+   <input id="md" type="date" aria-label="Fecha">
+   <input id="mn" type="text" placeholder="Nota (opcional)" aria-label="Nota">
+  </div>
+  <button class="p" id="add">Añadir movimiento</button> <span id="err" class="neg"></span>
+ </div>
+ <div class="card" style="margin-top:14px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px"><h2 style="margin:0">Movimientos del mes</h2><button id="csv">Exportar a CSV</button></div>
+  <div class="scroll"><table><thead><tr><th>Fecha</th><th>Categoría</th><th>Nota</th><th class="n">Importe</th><th></th></tr></thead><tbody id="tb"></tbody></table></div>
+ </div>
+</section>
+
+<section id="lim" hidden>
+ <div class="card"><h2>Límite mensual por categoría</h2><p style="color:var(--mut);margin-top:0">Se aplica a todos los meses. Deja vacío para no limitar.</p><div class="lims" id="lims"></div></div>
+</section>
+
+<section id="met" hidden>
+ <div class="card">
+  <h2>Nueva meta de ahorro</h2>
+  <div class="f"><input id="gn" placeholder="Nombre (p. ej. Viaje)" aria-label="Nombre de la meta"><input id="gt" type="number" min="1" step="0.01" placeholder="Objetivo" aria-label="Objetivo"><input id="gd" type="date" aria-label="Fecha objetivo"></div>
+  <button class="p" id="gadd">Crear meta</button>
+ </div>
+ <div id="goals" style="margin-top:14px;display:grid;gap:12px"></div>
+</section>
+<section id="aju" hidden>
+ <div class="card"><h2>Moneda</h2><select id="cur" aria-label="Moneda"></select><p class="note">Cambiar la moneda solo cambia el símbolo y el formato; no convierte los importes ya registrados.</p></div>
+ <div class="card"><h2>Apariencia</h2>
+  <div class="setrow"><span>Tema</span><div class="seg" id="sTheme"><button data-v="auto">Automático</button><button data-v="light">Claro</button><button data-v="dark">Oscuro</button></div></div>
+  <div class="setrow"><span>Color de acento</span><div class="sws" id="sAcc"></div></div>
+  <div class="setrow"><span>Tamaño del texto</span><div class="seg" id="sSize"><button data-v="90">Pequeño</button><button data-v="100">Normal</button><button data-v="115">Grande</button></div></div>
+ </div>
+ <div class="card"><h2>Datos</h2><button id="rst">Borrar todos los datos</button><p class="note">Elimina movimientos, límites y metas de este navegador.</p></div>
+</section>
+</div>
+
+<dialog id="dlg"><h2>Exportar movimientos</h2><p style="color:var(--mut)">Copia el contenido o descarga el archivo CSV.</p><textarea id="ta" readonly></textarea>
+<div class="acts"><button id="cp">Copiar</button><button class="p" id="dl">Descargar .csv</button><button id="cl">Cerrar</button></div></dialog>
+
+<script src="app.js"></script>
+</body>
+</html>
